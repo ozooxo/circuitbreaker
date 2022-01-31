@@ -11,9 +11,9 @@ from typing import AnyStr, Iterable
 from math import ceil, floor
 
 try:
-  from time import monotonic
+    from time import monotonic
 except ImportError:
-  from monotonic import monotonic
+    from monotonic import monotonic
 
 STATE_CLOSED = 'closed'
 STATE_OPEN = 'open'
@@ -23,7 +23,7 @@ STATE_HALF_OPEN = 'half_open'
 class CircuitBreaker(object):
     FAILURE_THRESHOLD = 5
     RECOVERY_TIMEOUT = 30
-    EXPECTED_EXCEPTION = Exception
+    EXPECTED_EXC = Exception
     FALLBACK_FUNCTION = None
 
     def __init__(self,
@@ -36,7 +36,7 @@ class CircuitBreaker(object):
         self._failure_count = 0
         self._failure_threshold = failure_threshold or self.FAILURE_THRESHOLD
         self._recovery_timeout = recovery_timeout or self.RECOVERY_TIMEOUT
-        self._expected_exception = expected_exception or self.EXPECTED_EXCEPTION
+        self._expected_exception = expected_exception or self.EXPECTED_EXC
         self._fallback_function = fallback_function or self.FALLBACK_FUNCTION
         self._name = name
         self._state = STATE_CLOSED
@@ -180,13 +180,14 @@ class CircuitBreakerError(Exception):
         self._circuit_breaker = circuit_breaker
 
     def __str__(self, *args, **kwargs):
-        return 'Circuit "%s" OPEN until %s (%d failures, %d sec remaining) (last_failure: %r)' % (
-            self._circuit_breaker.name,
-            self._circuit_breaker.open_until,
-            self._circuit_breaker.failure_count,
-            round(self._circuit_breaker.open_remaining),
-            self._circuit_breaker.last_failure,
-        )
+        return 'Circuit "%s" OPEN until %s (%d failures, ' \
+               '%d sec remaining) (last_failure: %r)' % (
+                   self._circuit_breaker.name,
+                   self._circuit_breaker.open_until,
+                   self._circuit_breaker.failure_count,
+                   round(self._circuit_breaker.open_remaining),
+                   self._circuit_breaker.last_failure,
+               )
 
 
 class CircuitBreakerMonitor(object):
@@ -232,7 +233,6 @@ def circuit(failure_threshold=None,
             name=None,
             fallback_function=None,
             cls=CircuitBreaker):
-
     # if the decorator is used without parameters, the
     # wrapped function is provided as first argument
     if callable(failure_threshold):
